@@ -1,6 +1,16 @@
 # RushFit — Aplikasi Latihan & Progres Kebugaran
 
-Aplikasi kebugaran pribadi untuk mencatat latihan harian, memantau progres kekuatan, dan mendapat rekomendasi latihan berbasis data. Login hanya dengan akun Google yang terdaftar.
+Aplikasi kebugaran pribadi untuk mencatat latihan harian, memantau progres kekuatan, dan mendapat rekomendasi latihan berbasis AI. Login hanya dengan akun Google yang terdaftar.
+
+## Tujuan Aplikasi
+
+Mencatat olahraga seringkali masih dilakukan manual di kertas atau spreadsheet, terpisah dari analisis progresnya. RushFit menyatukan keduanya:
+
+- **Semua jenis latihan dalam satu tempat**: cardio (lari, bersepeda, renang), gym (beban), dan bodyweight dicatat dengan format yang sesuai tiap jenisnya.
+- **Kalori otomatis**: estimasi dari MET Compendium 2024 tanpa perlu isi manual.
+- **Lacak kekuatan secara ilmiah**: estimasi 1RM (formula Epley) per gerakan ditampilkan sebagai grafik, lengkap dengan proyeksi beban dari regresi linear.
+- **Rekomendasi personal dari AI**: Claude menganalisis pola latihan 28 hari terakhir dan menyusun saran spesifik — termasuk kelompok otot yang jarang dilatih.
+- **Privat**: login hanya dengan akun Google yang emailnya terdaftar di allowlist.
 
 ## Fitur
 
@@ -17,7 +27,7 @@ Aplikasi kebugaran pribadi untuk mencatat latihan harian, memantau progres kekua
 | 📄 **Template Latihan** | Simpan susunan gerakan favorit; gunakan langsung di sesi latihan |
 | 📈 **Grafik Progres** | Estimasi 1RM (formula Epley) per gerakan dari waktu ke waktu + volume mingguan |
 | 🎯 **Proyeksi Beban** | Regresi linear dari tren 1RM; tampil saat data ≥ 4 sesi |
-| 💡 **Rekomendasi AI** | Kode mendeteksi ketidakseimbangan kelompok otot, Claude API menyusun saran; bisa disimpan atau diabaikan |
+| 💡 **Rekomendasi AI** | Claude mendeteksi ketidakseimbangan kelompok otot dan menyusun saran; bisa disimpan atau diabaikan |
 
 ## Arsitektur
 
@@ -37,6 +47,50 @@ Alur singkat:
 3. Client Components menggunakan route proxy `/api/go?path=...` supaya tidak langsung menghubungi Go API.
 4. Sesi latihan langsung disimpan di `localStorage` selama berlangsung; saat selesai dikirim ke Go API dan masuk ke diary.
 5. Go API menganalisis pola latihan dan memanggil Claude API untuk menghasilkan rekomendasi.
+
+## Screenshot
+
+### Beranda
+
+Dashboard harian dengan akses cepat ke diary dan latihan langsung.
+
+<img src="docs/screenshots/home.jpeg" alt="Beranda" width="300">
+
+### Diary
+
+Pilih jenis latihan (Cardio, Gym, Bodyweight), isi gerakan dan set, lalu simpan.
+
+<img src="docs/screenshots/diary_3.jpeg" alt="Diary Cardio" width="300"> <img src="docs/screenshots/diary_1.jpeg" alt="Diary Gym" width="300"> <img src="docs/screenshots/diary_2.jpeg" alt="Kalori dan Volume" width="300">
+
+### Riwayat
+
+Semua sesi tercatat, disaring per jenis, dikelompokkan per minggu.
+
+<img src="docs/screenshots/history.jpeg" alt="Riwayat" width="300"> <img src="docs/screenshots/history-detail.jpeg" alt="Detail Sesi" width="300">
+
+### Latihan Langsung
+
+Mulai sesi dari nol atau dari template. Timer berjalan, rest timer muncul otomatis setelah set selesai.
+
+<img src="docs/screenshots/latihan-langsung.jpeg" alt="Pilih template atau mulai langsung" width="300"> <img src="docs/screenshots/tambah-gerakan-latihan-langsung.jpeg" alt="Tambah gerakan" width="300"> <img src="docs/screenshots/selesai-latihan-langsung.jpeg" alt="Sesi aktif dengan rest timer" width="300">
+
+### Template
+
+Simpan susunan gerakan favorit dan gunakan di sesi berikutnya.
+
+<img src="docs/screenshots/template-latihan-langsung.jpeg" alt="Daftar template" width="300">
+
+### Progres
+
+Daftar gerakan dikelompokkan per grup otot; klik untuk melihat grafik.
+
+<img src="docs/screenshots/progress.jpeg" alt="Daftar progres" width="300"> <img src="docs/screenshots/progress-detail.jpeg" alt="Grafik 1RM dan volume" width="300">
+
+### Profil
+
+Atur berat badan (untuk estimasi 1RM bodyweight), satuan metric/imperial, dan kelola gerakan custom.
+
+<img src="docs/screenshots/profile.jpeg" alt="Profil" width="300">
 
 ## Tech Stack
 
@@ -78,7 +132,12 @@ npm install
 npm run dev                       # http://localhost:3000
 ```
 
-`INTERNAL_API_KEY` harus sama di `api/.env` dan `web/.env.local`.
+`INTERNAL_API_KEY` harus sama di `api/.env` dan `web/.env.local`. Tambahkan email kamu ke allowlist sebelum login:
+
+```bash
+cd api
+go run ./cmd/allow -email kamu@gmail.com -role admin
+```
 
 ## Database
 
